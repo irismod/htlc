@@ -73,7 +73,7 @@ func (AppModuleBasic) GetTxCmd(clientCtx client.Context) *cobra.Command {
 
 // GetQueryCmd returns the root query command for the HTLC module.
 func (AppModuleBasic) GetQueryCmd(clientCtx client.Context) *cobra.Command {
-	return cli.GetQueryCmd(StoreKey, clientCtx.Codec)
+	return cli.GetQueryCmd(clientCtx.Codec)
 }
 
 // RegisterInterfaceTypes implements InterfaceModule.RegisterInterfaceTypes

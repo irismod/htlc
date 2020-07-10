@@ -17,7 +17,7 @@ import (
 )
 
 // GetQueryCmd returns the cli query commands for the module.
-func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 	htlcQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Querying commands for the HTLC module",
@@ -27,14 +27,14 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	htlcQueryCmd.AddCommand(flags.GetCommands(
-		GetCmdQueryHTLC(queryRoute, cdc),
+		GetCmdQueryHTLC(cdc),
 	)...)
 
 	return htlcQueryCmd
 }
 
 // GetCmdQueryHTLC implements the query HTLC command.
-func GetCmdQueryHTLC(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetCmdQueryHTLC(cdc *codec.Codec) *cobra.Command {
 	return &cobra.Command{
 		Use:   "htlc [hash-lock]",
 		Short: "Query an HTLC",
