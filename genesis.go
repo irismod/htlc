@@ -3,6 +3,8 @@ package htlc
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/irismod/htlc/keeper"
+	"github.com/irismod/htlc/types"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
@@ -10,8 +12,8 @@ import (
 )
 
 // InitGenesis stores the genesis state
-func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
-	if err := ValidateGenesis(data); err != nil {
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
+	if err := types.ValidateGenesis(data); err != nil {
 		panic(err.Error())
 	}
 
@@ -24,14 +26,14 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 }
 
 // ExportGenesis outputs the genesis state
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
-	pendingHTLCs := make(map[string]HTLC)
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
+	pendingHTLCs := make(map[string]types.HTLC)
 
-	k.IterateHTLCs(ctx, func(hlock tmbytes.HexBytes, h HTLC) (stop bool) {
-		if h.State == Open {
+	k.IterateHTLCs(ctx, func(hlock tmbytes.HexBytes, h types.HTLC) (stop bool) {
+		if h.State == types.Open {
 			h.ExpirationHeight = h.ExpirationHeight - uint64(ctx.BlockHeight()) + 1
 			pendingHTLCs[hlock.String()] = h
-		} else if h.State == Expired {
+		} else if h.State == types.Expired {
 			err := k.RefundHTLC(ctx, hlock)
 			if err != nil {
 				panic(fmt.Errorf("failed to export the HTLC genesis state: %s", hlock.String()))
@@ -41,7 +43,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		return false
 	})
 
-	return GenesisState{
+	return types.GenesisState{
 		PendingHTLCs: pendingHTLCs,
 	}
 }

@@ -1,6 +1,7 @@
 package simapp
 
 import (
+	"github.com/irismod/htlc"
 	"io"
 	"os"
 
@@ -71,7 +72,8 @@ import (
 	tmos "github.com/tendermint/tendermint/libs/os"
 	dbm "github.com/tendermint/tm-db"
 
-	"github.com/irismod/htlc"
+	htlctypes "github.com/irismod/htlc/types"
+	htlckeeper"github.com/irismod/htlc/keeper"
 )
 
 const appName = "SimApp"
@@ -116,7 +118,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		htlc.HTLCAccName:                nil,
+		htlctypes.HTLCAccName:                nil,
 	}
 
 	// module accounts that are allowed to receive services
@@ -159,7 +161,7 @@ type SimApp struct {
 	IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
 	EvidenceKeeper   evidencekeeper.Keeper
 	TransferKeeper   ibctransferkeeper.Keeper
-	HTLCKeeper       htlc.Keeper
+	HTLCKeeper       htlckeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -194,7 +196,7 @@ func NewSimApp(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey,
 		govtypes.StoreKey, paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey,
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
-		htlc.StoreKey,
+		htlctypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -293,7 +295,7 @@ func NewSimApp(
 	evidenceKeeper.SetRouter(evidenceRouter)
 	app.EvidenceKeeper = *evidenceKeeper
 
-	app.HTLCKeeper = htlc.NewKeeper(appCodec, keys[htlc.StoreKey], app.AccountKeeper, app.BankKeeper)
+	app.HTLCKeeper = htlckeeper.NewKeeper(appCodec, keys[htlctypes.StoreKey], app.AccountKeeper, app.BankKeeper)
 
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
@@ -322,7 +324,7 @@ func NewSimApp(
 	// NOTE: staking module is required if HistoricalEntries param > 0
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName, minttypes.ModuleName, distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, htlc.ModuleName,
+		evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName, htlctypes.ModuleName,
 	)
 	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName)
 
@@ -335,7 +337,7 @@ func NewSimApp(
 		capabilitytypes.ModuleName, authtypes.ModuleName, distrtypes.ModuleName, stakingtypes.ModuleName, banktypes.ModuleName,
 		slashingtypes.ModuleName, govtypes.ModuleName, minttypes.ModuleName, crisistypes.ModuleName,
 		ibchost.ModuleName, genutiltypes.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
-		htlc.ModuleName,
+		htlctypes.ModuleName,
 	)
 
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
@@ -537,7 +539,7 @@ func initParamsKeeper(appCodec codec.Marshaler, key, tkey sdk.StoreKey) paramske
 	paramsKeeper.Subspace(slashingtypes.ModuleName)
 	paramsKeeper.Subspace(govtypes.ModuleName).WithKeyTable(govtypes.ParamKeyTable())
 	paramsKeeper.Subspace(crisistypes.ModuleName)
-	paramsKeeper.Subspace(htlc.ModuleName)
+	paramsKeeper.Subspace(htlctypes.ModuleName)
 
 	return paramsKeeper
 }

@@ -5,31 +5,34 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	"github.com/irismod/htlc/keeper"
+	"github.com/irismod/htlc/types"
 )
 
 // NewHandler creates an sdk.Handler for all the HTLC type messages
-func NewHandler(k Keeper) sdk.Handler {
+func NewHandler(k keeper.Keeper) sdk.Handler {
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
-		case *MsgCreateHTLC:
+		case *types.MsgCreateHTLC:
 			return handleMsgCreateHTLC(ctx, k, msg)
 
-		case *MsgClaimHTLC:
+		case *types.MsgClaimHTLC:
 			return handleMsgClaimHTLC(ctx, k, msg)
 
-		case *MsgRefundHTLC:
+		case *types.MsgRefundHTLC:
 			return handleMsgRefundHTLC(ctx, k, msg)
 
 		default:
-			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", ModuleName, msg)
+			return nil, sdkerrors.Wrapf(sdkerrors.ErrUnknownRequest, "unrecognized %s message type: %T", types.ModuleName, msg)
 		}
 	}
 }
 
 // handleMsgCreateHTLC handles MsgCreateHTLC
-func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg *MsgCreateHTLC) (*sdk.Result, error) {
+func handleMsgCreateHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgCreateHTLC) (*sdk.Result, error) {
 	err := k.CreateHTLC(
 		ctx,
 		msg.Sender,
@@ -46,17 +49,17 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg *MsgCreateHTLC) (*sdk.Re
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			EventTypeCreateHTLC,
-			sdk.NewAttribute(AttributeKeySender, msg.Sender.String()),
-			sdk.NewAttribute(AttributeKeyReceiver, msg.To.String()),
-			sdk.NewAttribute(AttributeKeyReceiverOnOtherChain, msg.ReceiverOnOtherChain),
-			sdk.NewAttribute(AttributeKeyAmount, msg.Amount.String()),
-			sdk.NewAttribute(AttributeKeyHashLock, msg.HashLock.String()),
-			sdk.NewAttribute(AttributeKeyTimeLock, fmt.Sprintf("%d", msg.TimeLock)),
+			types.EventTypeCreateHTLC,
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender.String()),
+			sdk.NewAttribute(types.AttributeKeyReceiver, msg.To.String()),
+			sdk.NewAttribute(types.AttributeKeyReceiverOnOtherChain, msg.ReceiverOnOtherChain),
+			sdk.NewAttribute(types.AttributeKeyAmount, msg.Amount.String()),
+			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock.String()),
+			sdk.NewAttribute(types.AttributeKeyTimeLock, fmt.Sprintf("%d", msg.TimeLock)),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
 		),
 	})
@@ -65,7 +68,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg *MsgCreateHTLC) (*sdk.Re
 }
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
-func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg *MsgClaimHTLC) (*sdk.Result, error) {
+func handleMsgClaimHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgClaimHTLC) (*sdk.Result, error) {
 	err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
 		return nil, err
@@ -73,14 +76,14 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg *MsgClaimHTLC) (*sdk.Resu
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			EventTypeClaimHTLC,
-			sdk.NewAttribute(AttributeKeySender, msg.Sender.String()),
-			sdk.NewAttribute(AttributeKeyHashLock, msg.HashLock.String()),
-			sdk.NewAttribute(AttributeKeySecret, msg.Secret.String()),
+			types.EventTypeClaimHTLC,
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender.String()),
+			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock.String()),
+			sdk.NewAttribute(types.AttributeKeySecret, msg.Secret.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
 		),
 	})
@@ -89,7 +92,7 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg *MsgClaimHTLC) (*sdk.Resu
 }
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
-func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg *MsgRefundHTLC) (*sdk.Result, error) {
+func handleMsgRefundHTLC(ctx sdk.Context, k keeper.Keeper, msg *types.MsgRefundHTLC) (*sdk.Result, error) {
 	err := k.RefundHTLC(ctx, msg.HashLock)
 	if err != nil {
 		return nil, err
@@ -97,13 +100,13 @@ func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg *MsgRefundHTLC) (*sdk.Re
 
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
-			EventTypeRefundHTLC,
-			sdk.NewAttribute(AttributeKeySender, msg.Sender.String()),
-			sdk.NewAttribute(AttributeKeyHashLock, msg.HashLock.String()),
+			types.EventTypeRefundHTLC,
+			sdk.NewAttribute(types.AttributeKeySender, msg.Sender.String()),
+			sdk.NewAttribute(types.AttributeKeyHashLock, msg.HashLock.String()),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, AttributeValueCategory),
+			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
 			sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender.String()),
 		),
 	})
