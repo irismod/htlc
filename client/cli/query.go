@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"encoding/hex"
 	"fmt"
 	"strings"
@@ -8,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -44,35 +44,25 @@ func GetCmdQueryHTLC(queryRoute string, cdc *codec.Codec) *cobra.Command {
 Example:
 $ %s query htlc htlc <hash-lock>
 `,
-				version.ClientName,
+				version.AppName,
 			),
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := context.NewCLIContext().WithCodec(cdc)
+			cliCtx := client.NewContext().WithCodec(cdc).WithJSONMarshaler(cdc)
 
 			hashLock, err := hex.DecodeString(args[0])
 			if err != nil {
 				return err
 			}
 
-			bz, err := cdc.MarshalJSON(types.QueryHTLCParams{HashLock: hashLock})
+			queryClient := types.NewQueryClient(cliCtx)
+			param := types.QueryHTLCRequest{HashLock:hashLock }
+			response,err := queryClient.HTLC(context.Background(),&param)
 			if err != nil {
 				return err
 			}
-
-			route := fmt.Sprintf("custom/%s/%s", queryRoute, types.QueryHTLC)
-			res, _, err := cliCtx.QueryWithData(route, bz)
-			if err != nil {
-				return err
-			}
-
-			var htlc types.HTLC
-			if err := cdc.UnmarshalJSON(res, &htlc); err != nil {
-				return err
-			}
-
-			return cliCtx.PrintOutput(htlc)
+			return cliCtx.PrintOutput(response.Htlc)
 		},
 	}
 }

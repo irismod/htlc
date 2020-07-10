@@ -1,29 +1,26 @@
 package cli
 
 import (
-	"bufio"
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+
 	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 
 	"github.com/irismod/htlc/types"
 )
 
 // GetTxCmd returns the transaction commands for this module
-func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
+func GetTxCmd(ctx client.Context) *cobra.Command {
 	htlcTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "HTLC transaction subcommands",
@@ -33,16 +30,16 @@ func GetTxCmd(storeKey string, cdc *codec.Codec) *cobra.Command {
 	}
 
 	htlcTxCmd.AddCommand(flags.PostCommands(
-		GetCmdCreateHTLC(cdc),
-		GetCmdClaimHTLC(cdc),
-		GetCmdRefundHTLC(cdc),
+		GetCmdCreateHTLC(ctx),
+		GetCmdClaimHTLC(ctx),
+		GetCmdRefundHTLC(ctx),
 	)...)
 
 	return htlcTxCmd
 }
 
 // GetCmdCreateHTLC implements creating an HTLC command
-func GetCmdCreateHTLC(cdc *codec.Codec) *cobra.Command {
+func GetCmdCreateHTLC(clientCtx client.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create an HTLC",
@@ -53,14 +50,12 @@ Example:
 $ %s tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-other-chain> --amount=<amount> 
 --secret=<secret> --hash-lock=<hash-lock> --timestamp=<timestamp> --time-lock=<time-lock> --from=mykey
 `,
-				version.ClientName,
+				version.AppName,
 			),
 		),
 		PreRunE: preCheckCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(auth.DefaultTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			cliCtx := clientCtx.InitWithInput(cmd.InOrStdin())
 
 			sender := cliCtx.GetFromAddress()
 
@@ -115,7 +110,7 @@ $ %s tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-othe
 				return err
 			}
 
-			if err = authclient.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg}); err == nil && !flags.Changed(FlagHashLock) {
+			if err = tx.GenerateOrBroadcastTx(clientCtx, &msg); err == nil && !flags.Changed(FlagHashLock) {
 				fmt.Println("**Important** save this secret, hashLock in a safe place.")
 				fmt.Println("It is the only way to claim or refund the locked coins from an HTLC")
 				fmt.Println()
@@ -137,7 +132,7 @@ $ %s tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-othe
 }
 
 // GetCmdClaimHTLC implements claiming an HTLC command
-func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
+func GetCmdClaimHTLC(clientCtx client.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "claim [hash-lock] [secret]",
 		Short: "Claim an HTLC",
@@ -147,14 +142,12 @@ func GetCmdClaimHTLC(cdc *codec.Codec) *cobra.Command {
 Example:
 $ %s tx htlc claim <hash-lock> <secret> --from mykey
 `,
-				version.ClientName,
+				version.AppName,
 			),
 		),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(auth.DefaultTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			cliCtx := clientCtx.InitWithInput(cmd.InOrStdin())
 
 			sender := cliCtx.GetFromAddress()
 
@@ -173,7 +166,7 @@ $ %s tx htlc claim <hash-lock> <secret> --from mykey
 				return err
 			}
 
-			return authclient.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			return tx.GenerateOrBroadcastTx(cliCtx, &msg)
 		},
 	}
 
@@ -181,7 +174,7 @@ $ %s tx htlc claim <hash-lock> <secret> --from mykey
 }
 
 // GetCmdRefundHTLC implements refunding an HTLC command
-func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
+func GetCmdRefundHTLC(clientCtx client.Context) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refund [hash-lock]",
 		Short: "Refund an HTLC",
@@ -191,14 +184,12 @@ func GetCmdRefundHTLC(cdc *codec.Codec) *cobra.Command {
 Example:
 $ %s tx htlc refund <hash-lock> --from mykey
 `,
-				version.ClientName,
+				version.AppName,
 			),
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			inBuf := bufio.NewReader(cmd.InOrStdin())
-			txBldr := auth.NewTxBuilderFromCLI(inBuf).WithTxEncoder(auth.DefaultTxEncoder(cdc))
-			cliCtx := context.NewCLIContextWithInput(inBuf).WithCodec(cdc)
+			cliCtx := clientCtx.InitWithInput(cmd.InOrStdin())
 
 			sender := cliCtx.GetFromAddress()
 
@@ -212,7 +203,7 @@ $ %s tx htlc refund <hash-lock> --from mykey
 				return err
 			}
 
-			return authclient.GenerateOrBroadcastMsgs(cliCtx, txBldr, []sdk.Msg{msg})
+			return tx.GenerateOrBroadcastTx(cliCtx, &msg)
 		},
 	}
 

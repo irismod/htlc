@@ -13,13 +13,13 @@ func NewHandler(k Keeper) sdk.Handler {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
 
 		switch msg := msg.(type) {
-		case MsgCreateHTLC:
+		case *MsgCreateHTLC:
 			return handleMsgCreateHTLC(ctx, k, msg)
 
-		case MsgClaimHTLC:
+		case *MsgClaimHTLC:
 			return handleMsgClaimHTLC(ctx, k, msg)
 
-		case MsgRefundHTLC:
+		case *MsgRefundHTLC:
 			return handleMsgRefundHTLC(ctx, k, msg)
 
 		default:
@@ -29,7 +29,7 @@ func NewHandler(k Keeper) sdk.Handler {
 }
 
 // handleMsgCreateHTLC handles MsgCreateHTLC
-func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) (*sdk.Result, error) {
+func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg *MsgCreateHTLC) (*sdk.Result, error) {
 	err := k.CreateHTLC(
 		ctx,
 		msg.Sender,
@@ -65,7 +65,7 @@ func handleMsgCreateHTLC(ctx sdk.Context, k Keeper, msg MsgCreateHTLC) (*sdk.Res
 }
 
 // handleMsgClaimHTLC handles MsgClaimHTLC
-func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) (*sdk.Result, error) {
+func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg *MsgClaimHTLC) (*sdk.Result, error) {
 	err := k.ClaimHTLC(ctx, msg.HashLock, msg.Secret)
 	if err != nil {
 		return nil, err
@@ -89,7 +89,7 @@ func handleMsgClaimHTLC(ctx sdk.Context, k Keeper, msg MsgClaimHTLC) (*sdk.Resul
 }
 
 // handleMsgRefundHTLC handles MsgRefundHTLC
-func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg MsgRefundHTLC) (*sdk.Result, error) {
+func handleMsgRefundHTLC(ctx sdk.Context, k Keeper, msg *MsgRefundHTLC) (*sdk.Result, error) {
 	err := k.RefundHTLC(ctx, msg.HashLock)
 	if err != nil {
 		return nil, err

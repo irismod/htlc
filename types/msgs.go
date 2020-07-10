@@ -24,9 +24,11 @@ const (
 	MaxTimeLock                     = 25480 // maximum time span for HTLC
 )
 
-var _ sdk.Msg = MsgCreateHTLC{}
-var _ sdk.Msg = MsgClaimHTLC{}
-var _ sdk.Msg = MsgRefundHTLC{}
+var (
+	_ sdk.Msg = &MsgCreateHTLC{}
+	_ sdk.Msg = &MsgClaimHTLC{}
+	_ sdk.Msg = &MsgRefundHTLC{}
+)
 
 // NewMsgCreateHTLC creates a new MsgCreateHTLC instance
 func NewMsgCreateHTLC(

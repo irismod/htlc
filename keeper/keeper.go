@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/exported"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
 	"github.com/irismod/htlc/types"
 )
@@ -46,6 +46,6 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 }
 
 // GetHTLCAccount returns the HTLC module account
-func (k Keeper) GetHTLCAccount(ctx sdk.Context) exported.ModuleAccountI {
+func (k Keeper) GetHTLCAccount(ctx sdk.Context) authtypes.ModuleAccountI {
 	return k.accountKeeper.GetModuleAccount(ctx, types.HTLCAccName)
 }
