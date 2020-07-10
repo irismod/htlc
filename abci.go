@@ -2,12 +2,13 @@ package htlc
 
 import (
 	"fmt"
-	"github.com/irismod/htlc/keeper"
-	"github.com/irismod/htlc/types"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irismod/htlc/keeper"
+	"github.com/irismod/htlc/types"
 )
 
 // BeginBlocker handles block beginning logic for HTLC

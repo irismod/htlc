@@ -2,6 +2,7 @@ package keeper_test
 
 import (
 	gocontext "context"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 
 	"github.com/irismod/htlc/types"
@@ -17,8 +18,8 @@ func (suite *KeeperTestSuite) TestQueryBalance() {
 	types.RegisterQueryServer(queryHelper, app.HTLCKeeper)
 	queryClient := types.NewQueryClient(queryHelper)
 
-	response,err := queryClient.HTLC(gocontext.Background(),&types.QueryHTLCRequest{HashLock:hashLock})
+	response, err := queryClient.HTLC(gocontext.Background(), &types.QueryHTLCRequest{HashLock: hashLock})
 
 	suite.NoError(err)
-	suite.Equal(amount,response.Htlc.Amount)
+	suite.Equal(amount, response.Htlc.Amount)
 }

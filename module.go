@@ -3,7 +3,6 @@ package htlc
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/irismod/htlc/keeper"
 
 	"math/rand"
 
@@ -21,6 +20,7 @@ import (
 
 	"github.com/irismod/htlc/client/cli"
 	"github.com/irismod/htlc/client/rest"
+	"github.com/irismod/htlc/keeper"
 	"github.com/irismod/htlc/simulation"
 	"github.com/irismod/htlc/types"
 )

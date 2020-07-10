@@ -57,8 +57,8 @@ $ %s query htlc htlc <hash-lock>
 			}
 
 			queryClient := types.NewQueryClient(cliCtx)
-			param := types.QueryHTLCRequest{HashLock:hashLock }
-			response,err := queryClient.HTLC(context.Background(),&param)
+			param := types.QueryHTLCRequest{HashLock: hashLock}
+			response, err := queryClient.HTLC(context.Background(), &param)
 			if err != nil {
 				return err
 			}

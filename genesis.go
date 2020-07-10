@@ -3,12 +3,13 @@ package htlc
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/irismod/htlc/keeper"
-	"github.com/irismod/htlc/types"
 
 	tmbytes "github.com/tendermint/tendermint/libs/bytes"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/irismod/htlc/keeper"
+	"github.com/irismod/htlc/types"
 )
 
 // InitGenesis stores the genesis state

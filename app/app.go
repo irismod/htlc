@@ -1,9 +1,13 @@
 package simapp
 
 import (
-	"github.com/irismod/htlc"
 	"io"
 	"os"
+
+	abci "github.com/tendermint/tendermint/abci/types"
+	"github.com/tendermint/tendermint/libs/log"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	dbm "github.com/tendermint/tm-db"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -67,13 +71,10 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	dbm "github.com/tendermint/tm-db"
 
+	"github.com/irismod/htlc"
+	htlckeeper "github.com/irismod/htlc/keeper"
 	htlctypes "github.com/irismod/htlc/types"
-	htlckeeper"github.com/irismod/htlc/keeper"
 )
 
 const appName = "SimApp"
@@ -118,7 +119,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		htlctypes.HTLCAccName:                nil,
+		htlctypes.HTLCAccName:          nil,
 	}
 
 	// module accounts that are allowed to receive services
@@ -132,7 +133,7 @@ var (
 // capabilities aren't needed for testing.
 type SimApp struct {
 	*baseapp.BaseApp
-	cdc      *codec.Codec
+	cdc               *codec.Codec
 	appCodec          codec.Marshaler
 	interfaceRegistry types.InterfaceRegistry
 
@@ -315,7 +316,7 @@ func NewSimApp(
 		ibc.NewAppModule(app.IBCKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
-		htlc.NewAppModule(appCodec,app.HTLCKeeper, app.AccountKeeper, app.BankKeeper),
+		htlc.NewAppModule(appCodec, app.HTLCKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -359,7 +360,7 @@ func NewSimApp(
 		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
 		params.NewAppModule(app.ParamsKeeper),
 		evidence.NewAppModule(app.EvidenceKeeper),
-		htlc.NewAppModule(appCodec,app.HTLCKeeper, app.AccountKeeper, app.BankKeeper),
+		htlc.NewAppModule(appCodec, app.HTLCKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	app.sm.RegisterStoreDecoders()

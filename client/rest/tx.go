@@ -3,8 +3,9 @@ package rest
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/client/tx"
 	"net/http"
+
+	"github.com/cosmos/cosmos-sdk/client/tx"
 
 	"github.com/gorilla/mux"
 
