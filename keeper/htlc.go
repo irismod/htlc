@@ -28,7 +28,7 @@ func (k Keeper) CreateHTLC(
 	}
 
 	// transfer the specified tokens to the HTLC module account
-	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.HTLCAccName, amount)
+	err := k.bankKeeper.SendCoinsFromAccountToModule(ctx, sender, types.ModuleName, amount)
 	if err != nil {
 		return err
 	}
@@ -65,7 +65,7 @@ func (k Keeper) ClaimHTLC(ctx sdk.Context, hashLock tmbytes.HexBytes, secret tmb
 	}
 
 	// do the claim
-	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.HTLCAccName, htlc.To, htlc.Amount)
+	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.To, htlc.Amount)
 	if err != nil {
 		return err
 	}
@@ -95,7 +95,7 @@ func (k Keeper) RefundHTLC(ctx sdk.Context, hashLock tmbytes.HexBytes) error {
 	}
 
 	// do the refund
-	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.HTLCAccName, htlc.Sender, htlc.Amount)
+	err := k.bankKeeper.SendCoinsFromModuleToAccount(ctx, types.ModuleName, htlc.Sender, htlc.Amount)
 	if err != nil {
 		return err
 	}

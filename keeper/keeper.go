@@ -28,8 +28,8 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 ) Keeper {
 	// ensure the HTLC module account is set
-	if addr := accountKeeper.GetModuleAddress(types.HTLCAccName); addr == nil {
-		panic(fmt.Sprintf("%s module account has not been set", types.HTLCAccName))
+	if addr := accountKeeper.GetModuleAddress(types.ModuleName); addr == nil {
+		panic(fmt.Sprintf("%s module account has not been set", types.ModuleName))
 	}
 
 	return Keeper{
@@ -47,5 +47,5 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 
 // GetHTLCAccount returns the HTLC module account
 func (k Keeper) GetHTLCAccount(ctx sdk.Context) authtypes.ModuleAccountI {
-	return k.accountKeeper.GetModuleAccount(ctx, types.HTLCAccName)
+	return k.accountKeeper.GetModuleAccount(ctx, types.ModuleName)
 }

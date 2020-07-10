@@ -16,9 +16,6 @@ const (
 
 	// RouterKey is the msg router key for the HTLC module
 	RouterKey string = ModuleName
-
-	// HTLCAccName is the root string for the HTLC account address
-	HTLCAccName = "htlc_account"
 )
 
 var (
