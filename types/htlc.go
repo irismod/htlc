@@ -53,7 +53,7 @@ func (h HTLC) Validate() error {
 		return sdkerrors.Wrapf(ErrInvalidSecret, "secret must be empty when the HTLC has not be claimed")
 	}
 
-	if len(h.Secret) > 0 && len(h.Secret) != SecretLength {
+	if h.State == Completed && len(h.Secret) != SecretLength {
 		return sdkerrors.Wrapf(ErrInvalidSecret, "length of the secret must be %d in bytes", SecretLength)
 	}
 
