@@ -11,7 +11,6 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -29,11 +28,11 @@ func GetTxCmd(ctx client.Context) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	htlcTxCmd.AddCommand(flags.PostCommands(
+	htlcTxCmd.AddCommand(
 		GetCmdCreateHTLC(ctx),
 		GetCmdClaimHTLC(ctx),
 		GetCmdRefundHTLC(ctx),
-	)...)
+	)
 
 	return htlcTxCmd
 }

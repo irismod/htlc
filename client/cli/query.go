@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/version"
 
@@ -26,9 +25,9 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	htlcQueryCmd.AddCommand(flags.GetCommands(
+	htlcQueryCmd.AddCommand(
 		GetCmdQueryHTLC(cdc),
-	)...)
+	)
 
 	return htlcQueryCmd
 }
