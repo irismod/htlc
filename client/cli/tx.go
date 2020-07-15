@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/viper"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -126,6 +127,7 @@ $ %s tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-othe
 	_ = cmd.MarkFlagRequired(FlagTo)
 	_ = cmd.MarkFlagRequired(FlagAmount)
 	_ = cmd.MarkFlagRequired(FlagTimeLock)
+	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
@@ -168,6 +170,7 @@ $ %s tx htlc claim <hash-lock> <secret> --from mykey
 			return tx.GenerateOrBroadcastTx(cliCtx, &msg)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }
@@ -205,6 +208,7 @@ $ %s tx htlc refund <hash-lock> --from mykey
 			return tx.GenerateOrBroadcastTx(cliCtx, &msg)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
 
 	return cmd
 }

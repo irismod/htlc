@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/version"
 
@@ -34,7 +35,7 @@ func GetQueryCmd(cdc *codec.Codec) *cobra.Command {
 
 // GetCmdQueryHTLC implements the query HTLC command.
 func GetCmdQueryHTLC(cdc *codec.Codec) *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "htlc [hash-lock]",
 		Short: "Query an HTLC",
 		Long: strings.TrimSpace(
@@ -64,4 +65,7 @@ $ %s query htlc htlc <hash-lock>
 			return cliCtx.PrintOutput(response.Htlc)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+
+	return cmd
 }
