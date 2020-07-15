@@ -55,9 +55,9 @@ $ %s tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-othe
 		),
 		PreRunE: preCheckCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := clientCtx.InitWithInput(cmd.InOrStdin())
+			clientCtx := clientCtx.InitWithInput(cmd.InOrStdin())
 
-			sender := cliCtx.GetFromAddress()
+			sender := clientCtx.GetFromAddress()
 
 			to, err := sdk.AccAddressFromBech32(viper.GetString(FlagTo))
 			if err != nil {
@@ -148,9 +148,9 @@ $ %s tx htlc claim <hash-lock> <secret> --from mykey
 		),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := clientCtx.InitWithInput(cmd.InOrStdin())
+			clientCtx := clientCtx.InitWithInput(cmd.InOrStdin())
 
-			sender := cliCtx.GetFromAddress()
+			sender := clientCtx.GetFromAddress()
 
 			hashLock, err := hex.DecodeString(args[0])
 			if err != nil {
@@ -167,7 +167,7 @@ $ %s tx htlc claim <hash-lock> <secret> --from mykey
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(cliCtx, &msg)
+			return tx.GenerateOrBroadcastTx(clientCtx, &msg)
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)
@@ -191,9 +191,9 @@ $ %s tx htlc refund <hash-lock> --from mykey
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			cliCtx := clientCtx.InitWithInput(cmd.InOrStdin())
+			clientCtx := clientCtx.InitWithInput(cmd.InOrStdin())
 
-			sender := cliCtx.GetFromAddress()
+			sender := clientCtx.GetFromAddress()
 
 			hashLock, err := hex.DecodeString(args[0])
 			if err != nil {
@@ -205,7 +205,7 @@ $ %s tx htlc refund <hash-lock> --from mykey
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(cliCtx, &msg)
+			return tx.GenerateOrBroadcastTx(clientCtx, &msg)
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)
