@@ -3,8 +3,10 @@ package keeper
 import (
 	"context"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/irismod/htlc/types"
 )
@@ -16,7 +18,7 @@ func (k Keeper) HTLC(c context.Context, request *types.QueryHTLCRequest) (*types
 
 	htlc, found := k.GetHTLC(ctx, request.HashLock)
 	if !found {
-		return nil, sdkerrors.Wrap(types.ErrUnknownHTLC, request.HashLock.String())
+		return nil, status.Errorf(codes.NotFound, "HTLC %s not found", request.HashLock.String())
 	}
 
 	return &types.QueryHTLCResponse{Htlc: &htlc}, nil
