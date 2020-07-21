@@ -20,7 +20,7 @@ import (
 )
 
 // GetTxCmd returns the transaction commands for this module
-func GetTxCmd(ctx client.Context) *cobra.Command {
+func GetTxCmd() *cobra.Command {
 	htlcTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "HTLC transaction subcommands",
@@ -30,16 +30,16 @@ func GetTxCmd(ctx client.Context) *cobra.Command {
 	}
 
 	htlcTxCmd.AddCommand(
-		GetCmdCreateHTLC(ctx),
-		GetCmdClaimHTLC(ctx),
-		GetCmdRefundHTLC(ctx),
+		GetCmdCreateHTLC(),
+		GetCmdClaimHTLC(),
+		GetCmdRefundHTLC(),
 	)
 
 	return htlcTxCmd
 }
 
 // GetCmdCreateHTLC implements creating an HTLC command
-func GetCmdCreateHTLC(clientCtx client.Context) *cobra.Command {
+func GetCmdCreateHTLC() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
 		Short: "Create an HTLC",
@@ -55,7 +55,11 @@ $ %s tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-othe
 		),
 		PreRunE: preCheckCmd,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := clientCtx.InitWithInput(cmd.InOrStdin())
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			sender := clientCtx.GetFromAddress()
 
@@ -133,7 +137,7 @@ $ %s tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-othe
 }
 
 // GetCmdClaimHTLC implements claiming an HTLC command
-func GetCmdClaimHTLC(clientCtx client.Context) *cobra.Command {
+func GetCmdClaimHTLC() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "claim [hash-lock] [secret]",
 		Short: "Claim an HTLC",
@@ -148,7 +152,11 @@ $ %s tx htlc claim <hash-lock> <secret> --from mykey
 		),
 		Args: cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := clientCtx.InitWithInput(cmd.InOrStdin())
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			sender := clientCtx.GetFromAddress()
 
@@ -176,7 +184,7 @@ $ %s tx htlc claim <hash-lock> <secret> --from mykey
 }
 
 // GetCmdRefundHTLC implements refunding an HTLC command
-func GetCmdRefundHTLC(clientCtx client.Context) *cobra.Command {
+func GetCmdRefundHTLC() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "refund [hash-lock]",
 		Short: "Refund an HTLC",
@@ -191,7 +199,11 @@ $ %s tx htlc refund <hash-lock> --from mykey
 		),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			clientCtx := clientCtx.InitWithInput(cmd.InOrStdin())
+			clientCtx := client.GetClientContextFromCmd(cmd)
+			clientCtx, err := client.ReadTxCommandFlags(clientCtx, cmd.Flags())
+			if err != nil {
+				return err
+			}
 
 			sender := clientCtx.GetFromAddress()
 
