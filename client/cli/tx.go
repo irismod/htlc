@@ -114,7 +114,7 @@ $ %s tx htlc create --to=<recipient> --receiver-on-other-chain=<receiver-on-othe
 				return err
 			}
 
-			if err = tx.GenerateOrBroadcastTx(clientCtx, &msg); err == nil && !flags.Changed(FlagHashLock) {
+			if err = tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg); err == nil && !flags.Changed(FlagHashLock) {
 				fmt.Println("**Important** save this secret, hashLock in a safe place.")
 				fmt.Println("It is the only way to claim or refund the locked coins from an HTLC")
 				fmt.Println()
@@ -175,7 +175,7 @@ $ %s tx htlc claim <hash-lock> <secret> --from mykey
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, &msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)
@@ -217,7 +217,7 @@ $ %s tx htlc refund <hash-lock> --from mykey
 				return err
 			}
 
-			return tx.GenerateOrBroadcastTx(clientCtx, &msg)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), &msg)
 		},
 	}
 	flags.AddTxFlagsToCmd(cmd)
