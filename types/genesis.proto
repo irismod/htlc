@@ -1,0 +1,12 @@
+syntax = "proto3";
+package irismod.htlc;
+
+import "types/types.proto";
+import "third_party/proto/gogoproto/gogo.proto";
+
+option go_package = "github.com/irismod/htlc/types";
+
+// GenesisState defines the nft module's genesis state.
+message GenesisState {
+    map<string, HTLC> pending_htlcs = 1 [(gogoproto.nullable) = false];
+}

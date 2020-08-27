@@ -53,7 +53,7 @@ type RefundHTLCReq struct {
 func createHTLCHandlerFn(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req CreateHTLCReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
 			return
 		}
 
@@ -92,7 +92,7 @@ func claimHTLCHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		var req ClaimHTLCReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
 			return
 		}
 
@@ -128,7 +128,7 @@ func refundHTLCHandlerFn(cliCtx client.Context) http.HandlerFunc {
 		}
 
 		var req RefundHTLCReq
-		if !rest.ReadRESTReq(w, r, cliCtx.Codec, &req) {
+		if !rest.ReadRESTReq(w, r, cliCtx.JSONMarshaler, &req) {
 			return
 		}
 
