@@ -27,7 +27,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 }
 
 // ExportGenesis outputs the genesis state
-func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) *types.GenesisState {
 	pendingHtlcs := make(map[string]types.HTLC)
 
 	k.IterateHTLCs(ctx, func(hlock tmbytes.HexBytes, h types.HTLC) (stop bool) {
@@ -44,7 +44,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 		return false
 	})
 
-	return types.GenesisState{
+	return &types.GenesisState{
 		PendingHtlcs: pendingHtlcs,
 	}
 }
