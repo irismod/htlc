@@ -2,7 +2,7 @@ syntax = "proto3";
 package irismod.htlc;
 
 import "third_party/proto/gogoproto/gogo.proto";
-import "third_party/proto/cosmos-proto/types.proto";
+import "third_party/proto/cosmos-proto/coin.proto";
 
 option go_package                       = "github.com/irismod/htlc/types";
 option (gogoproto.goproto_getters_all)  = false;
@@ -14,7 +14,7 @@ message MsgCreateHTLC {
   bytes  sender                  = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   bytes  to                      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
-  repeated cosmos_sdk.v1.Coin amount = 4 [
+  repeated cosmos.base.v1beta1.Coin amount = 4 [
     (gogoproto.nullable)     = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
@@ -56,7 +56,7 @@ message HTLC {
   bytes  sender                  = 1 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   bytes  to                      = 2 [(gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
   string receiver_on_other_chain = 3 [(gogoproto.moretags) = "yaml:\"receiver_on_other_chain\""];
-  repeated cosmos_sdk.v1.Coin amount = 4 [
+  repeated cosmos.base.v1beta1.Coin amount = 4 [
     (gogoproto.nullable)     = false,
     (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
   ];
