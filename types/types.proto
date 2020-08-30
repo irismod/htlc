@@ -68,8 +68,6 @@ message HTLC {
 
 // HTLCState defines a state for an HTLC
 enum HTLCState {
-  option (gogoproto.enum_stringer)         = false;
-  option (gogoproto.goproto_enum_stringer) = false;
   option (gogoproto.goproto_enum_prefix)   = false;
 
   // HTLC_STATE_OPEN defines an open state.
