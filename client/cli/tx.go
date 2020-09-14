@@ -19,8 +19,8 @@ import (
 	"github.com/irismod/htlc/types"
 )
 
-// GetTxCmd returns the transaction commands for this module
-func GetTxCmd() *cobra.Command {
+// NewTxCmd returns the transaction commands for this module
+func NewTxCmd() *cobra.Command {
 	htlcTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "HTLC transaction subcommands",

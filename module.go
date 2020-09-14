@@ -39,13 +39,11 @@ type AppModuleBasic struct {
 }
 
 // Name returns the HTLC module's name.
-func (AppModuleBasic) Name() string {
-	return types.ModuleName
-}
+func (AppModuleBasic) Name() string { return types.ModuleName }
 
-// RegisterCodec registers the HTLC module's types for the given codec.
-func (AppModuleBasic) RegisterCodec(cdc *codec.LegacyAmino) {
-	types.RegisterCodec(cdc)
+// RegisterLegacyAminoCodec registers the HTLC module's types on the LegacyAmino codec.
+func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
+	types.RegisterLegacyAminoCodec(cdc)
 }
 
 // DefaultGenesis returns default genesis state as raw bytes for the HTLC
@@ -66,26 +64,26 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONMarshaler, config client.TxE
 
 // RegisterRESTRoutes registers the REST routes for the HTLC module.
 func (AppModuleBasic) RegisterRESTRoutes(clientCtx client.Context, rtr *mux.Router) {
-	rest.RegisterRoutes(clientCtx, rtr)
+	rest.RegisterHandlers(clientCtx, rtr)
 }
 
 // RegisterGRPCRoutes registers the gRPC Gateway routes for the HTLC module.
-func (a AppModuleBasic) RegisterGRPCRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
+func (AppModuleBasic) RegisterGRPCRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
 	types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
 }
 
-// GetTxCmd returns the root tx command for the HTLC module.
+// NewTxCmd returns the root tx command for the HTLC module.
 func (AppModuleBasic) GetTxCmd() *cobra.Command {
-	return cli.GetTxCmd()
+	return cli.NewTxCmd()
 }
 
-// GetQueryCmd returns the root query command for the HTLC module.
+// GetQueryCmd returns no root query command for the HTLC module.
 func (AppModuleBasic) GetQueryCmd() *cobra.Command {
 	return cli.GetQueryCmd()
 }
 
-// RegisterInterfaces implements AppModuleBasic.RegisterInterfaces
-func (a AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
+// RegisterInterfaces registers interfaces and implementations of the HTLC module.
+func (AppModuleBasic) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	types.RegisterInterfaces(registry)
 }
 
@@ -100,45 +98,39 @@ type AppModule struct {
 	bankKeeper    types.BankKeeper
 }
 
+// RegisterQueryService registers a GRPC query service to respond to the
+// module-specific GRPC queries.
+func (am AppModule) RegisterQueryService(server grpc.Server) {
+	types.RegisterQueryServer(server, am.keeper)
+}
+
 // NewAppModule creates a new AppModule object
 func NewAppModule(cdc codec.Marshaler, keeper keeper.Keeper, accountKeeper types.AccountKeeper, bankKeeper types.BankKeeper) AppModule {
 	return AppModule{
-		AppModuleBasic: AppModuleBasic{cdc},
+		AppModuleBasic: AppModuleBasic{cdc: cdc},
 		keeper:         keeper,
 		accountKeeper:  accountKeeper,
 		bankKeeper:     bankKeeper,
 	}
 }
 
-func (am AppModule) Route() sdk.Route {
-	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
-}
-
-func (am AppModule) RegisterQueryService(server grpc.Server) {
-	types.RegisterQueryServer(server, am.keeper)
-}
-
 // Name returns the HTLC module's name.
-func (AppModule) Name() string {
-	return types.ModuleName
-}
+func (AppModule) Name() string { return types.ModuleName }
 
 // RegisterInvariants registers the HTLC module invariants.
 func (am AppModule) RegisterInvariants(ir sdk.InvariantRegistry) {
 }
 
-// NewHandler returns an sdk.Handler for the HTLC module.
-func (am AppModule) NewHandler() sdk.Handler {
-	return NewHandler(am.keeper)
+// Route returns the message routing key for the HTLC module.
+func (am AppModule) Route() sdk.Route {
+	return sdk.NewRoute(types.RouterKey, NewHandler(am.keeper))
 }
 
 // QuerierRoute returns the HTLC module's querier route name.
-func (AppModule) QuerierRoute() string {
-	return types.QuerierRoute
-}
+func (AppModule) QuerierRoute() string { return types.RouterKey }
 
 // LegacyQuerierHandler returns the HTLC module sdk.Querier.
-func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc codec.JSONMarshaler) sdk.Querier {
+func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sdk.Querier {
 	return keeper.NewQuerier(am.keeper, legacyQuerierCdc)
 }
 
@@ -146,6 +138,7 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc codec.JSONMarshaler) s
 // no validator updates.
 func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONMarshaler, data json.RawMessage) []abci.ValidatorUpdate {
 	var genesisState types.GenesisState
+
 	cdc.MustUnmarshalJSON(data, &genesisState)
 
 	InitGenesis(ctx, am.keeper, genesisState)
@@ -159,14 +152,12 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONMarshaler) json
 	return cdc.MustMarshalJSON(gs)
 }
 
-// BeginBlock returns the begin blocker for the HTLC module.
-func (am AppModule) BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock) {
-	BeginBlocker(ctx, am.keeper)
-}
+// BeginBlock performs a no-op.
+func (AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
 
 // EndBlock returns the end blocker for the HTLC module. It returns no validator
 // updates.
-func (am AppModule) EndBlock(ctx sdk.Context, req abci.RequestEndBlock) []abci.ValidatorUpdate {
+func (AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
 	return []abci.ValidatorUpdate{}
 }
 
@@ -179,7 +170,7 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 }
 
 // ProposalContents doesn't return any content functions for governance proposals.
-func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
+func (AppModule) ProposalContents(simState module.SimulationState) []simtypes.WeightedProposalContent {
 	return nil
 }
 
@@ -188,12 +179,12 @@ func (AppModule) RandomizedParams(r *rand.Rand) []simtypes.ParamChange {
 	return nil
 }
 
-// RegisterStoreDecoder registers a decoder for HTLC module's types
+// RegisterStoreDecoder registers a decoder for supply module's types
 func (am AppModule) RegisterStoreDecoder(sdr sdk.StoreDecoderRegistry) {
 	sdr[types.StoreKey] = simulation.NewDecodeStore(am.cdc)
 }
 
-// WeightedOperations returns the all the HTLC module operations with their respective weights.
+// WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	return []simtypes.WeightedOperation{}
 }
