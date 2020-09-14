@@ -1,15 +1,18 @@
 syntax = "proto3";
-package irismod.htlc.v1;
+package irismod.htlc;
 
-import "third_party/proto/gogoproto/gogo.proto";
-import "types/types.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "types.proto";
 
 option go_package = "github.com/irismod/htlc/types";
 
 // Query provides defines the gRPC querier service
 service Query {
   // Balance queries the balance of a single coin for a single account
-  rpc HTLC(QueryHTLCRequest) returns (QueryHTLCResponse) {}
+  rpc HTLC(QueryHTLCRequest) returns (QueryHTLCResponse) {
+    option (google.api.http).get = "/irismod/htlc/htlcs/{hash_lock}";
+  }
 }
 
 // QueryHTLCRequest is the request type for the Query/HTLC RPC method
