@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-func RegisterCodec(cdc *codec.LegacyAmino) {
+func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgCreateHTLC{}, "irismod/htlc/MsgCreateHTLC", nil)
 	cdc.RegisterConcrete(&MsgClaimHTLC{}, "irismod/htlc/MsgClaimHTLC", nil)
 	cdc.RegisterConcrete(&MsgRefundHTLC{}, "irismod/htlc/MsgRefundHTLC", nil)
@@ -23,13 +23,13 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 
 // ModuleCdc defines the module codec
 var (
-	amino = codec.New()
+	amino = codec.NewLegacyAmino()
 
 	ModuleCdc = codec.NewAminoCodec(amino)
 )
 
 func init() {
-	RegisterCodec(amino)
+	RegisterLegacyAminoCodec(amino)
 	cryptocodec.RegisterCrypto(amino)
 	amino.Seal()
 }

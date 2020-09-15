@@ -88,7 +88,7 @@ func (msg MsgCreateHTLC) ValidateBasic() error {
 
 // GetSignBytes implements Msg
 func (msg MsgCreateHTLC) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(&msg)
 	return sdk.MustSortJSON(bz)
 }
 
@@ -137,7 +137,7 @@ func (msg MsgClaimHTLC) ValidateBasic() error {
 
 // GetSignBytes implements Msg
 func (msg MsgClaimHTLC) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(&msg)
 	return sdk.MustSortJSON(bz)
 }
 
@@ -180,7 +180,7 @@ func (msg MsgRefundHTLC) ValidateBasic() error {
 
 // GetSignBytes implements Msg
 func (msg MsgRefundHTLC) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
+	bz := ModuleCdc.MustMarshalJSON(&msg)
 	return sdk.MustSortJSON(bz)
 }
 
